@@ -1,0 +1,93 @@
+<?php
+
+/*
+    Copyright (C) 2014-2016 Deciso B.V.
+    Copyright (C) 2008 Seth Mos
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    1. Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+?>
+
+<script type="text/javascript">
+  function gateways_widget_update(sender, data)
+  {
+      var tbody = sender.find('tbody');
+      data.map(function(gateway) {
+          var tr_content = [];
+          var tr_id = "gateways_widget_gw_" + gateway['name'];
+          if (tbody.find("#"+tr_id).length == 0) {
+              // add new gateway
+              tr_content.push('<tr id="'+tr_id+'">');
+              tr_content.push('<td><small><strong>'+gateway['name']+'</strong><br/>'+gateway['address']+'</small></td>');
+              tr_content.push('<td>'+gateway['delay']+'</td>');
+              tr_content.push('<td>'+gateway['loss']+'</td>');
+              tr_content.push('<td><font>'+gateway['status_translated']+'</font></td>');
+              tr_content.push('</tr>');
+              tbody.append(tr_content.join(''));
+          } else {
+              // update existing gateway
+              $("#"+tr_id+" > td:eq(1)").html(gateway['delay']);
+              $("#"+tr_id+" > td:eq(2)").html(gateway['loss']);
+              $("#"+tr_id+" > td:eq(3)").html('<font>'+gateway['status_translated']+'</font>');
+          }
+          // set color on status text
+          switch (gateway['status']) {
+            case 'force_down':
+              status_color = 'red';
+              break;
+            case 'down':
+              status_color = 'red';
+              break;
+            case 'loss':
+              status_color = 'purple';
+              break;
+            case 'delay':
+              status_color = 'purple';
+              break;
+            case 'none':
+              status_color = 'green';
+              break;
+            default:
+              status_color = '';
+              break;
+          }
+          $("#"+tr_id+" > td:eq(3) > font").removeAttr('color');
+          if (status_color != '') {
+            $("#"+tr_id+" > td:eq(3) > font").attr('color', status_color);
+          }
+      });
+  }
+</script>
+
+<!-- gateway table -->
+<table class="table table-striped table-condensed" data-plugin="gateway" data-callback="gateways_widget_update">
+    <thead>
+        <tr>
+            <th><?=gettext('Name')?></th>
+            <th><?=gettext('RTT')?></th>
+            <th><?=gettext('Loss')?></th>
+            <th><?=gettext('Status')?></th>
+        </tr>
+    </thead>
+    <tbody>
+  </tbody>
+</table>
